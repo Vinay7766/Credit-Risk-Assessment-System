@@ -28,7 +28,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 2) SYSTEM CONFIGURATION (API KEY)
+# 2) Api Key Config
 
 gemini_key = "Please Insert Your API Key Here"
 
@@ -258,3 +258,4 @@ with st.expander("📉 Model Performance"):
         st.metric("MAE", f"{r_metrics['mae']:.4f}")
 
         st.metric("R2", f"{r_metrics['r2']:.4f}")
+
