@@ -7,9 +7,8 @@ import google.generativeai as genai
 from gtts import gTTS
 from io import BytesIO
 
-# ==========================================
-# 1. PAGE CONFIGURATION & CUSTOM CSS
-# ==========================================
+# 1) PAGE CONFIGURATION & CUSTOM CSS
+
 st.set_page_config(
     page_title="CreditIQ | AI Risk Analytics",
     page_icon="💳",
@@ -17,7 +16,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for Fintech Look
+# CSS 
 st.markdown("""
 <style>
     .main { background-color: #f8f9fa; }
@@ -29,15 +28,12 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ==========================================
-# 2. SYSTEM CONFIGURATION (API KEY)
-# ==========================================
-# 🔴 ACTION REQUIRED: PASTE YOUR API KEY INSIDE THE QUOTES BELOW 🔴
-gemini_key = "AIzaSyC-wyVKrQoMu1q2Lg9AwLpEUhbg_aDAULs"
+# 2) SYSTEM CONFIGURATION (API KEY)
 
-# ==========================================
-# 3. LOAD RESOURCES
-# ==========================================
+gemini_key = "Please Insert Your API Key Here"
+
+# 3) LOAD RESOURCES
+
 @st.cache_resource
 def load_data_and_models():
     # Load Models
@@ -55,9 +51,8 @@ except FileNotFoundError:
     st.error("⚠️ Critical Error: Model files not found. Please run your Jupyter Notebook (Step 1) to generate the .pkl files first.")
     st.stop()
 
-# ==========================================
-# 4. SIDEBAR: INPUTS & SETTINGS
-# ==========================================
+# 4) SIDEBAR :- INPUTS & SETTINGS
+
 st.sidebar.image("https://img.icons8.com/color/96/000000/safe-ok.png", width=80)
 st.sidebar.title("CreditIQ")
 st.sidebar.markdown("AI-Powered Underwriting")
@@ -89,9 +84,8 @@ with tab_settings:
     narration_mode = st.toggle("Enable Narration Mode")
     show_shap = st.checkbox("Show Explainer Charts", value=True)
 
-# ==========================================
-# 5. PROCESSING LOGIC
-# ==========================================
+# 5) Processing Logic
+
 def preprocess_input(l_amt, term, dti_val, install, gr, purp, f_amt, f_inv):
     grade_map = {'A': 1, 'B': 2, 'C': 3, 'D': 4, 'E': 5, 'F': 6, 'G': 7}
     
@@ -121,9 +115,9 @@ prob_default = clf.predict_proba(input_scaled)[0][1]
 pred_default = 1 if prob_default > 0.5 else 0
 pred_int_rate = reg.predict(input_scaled)[0]
 
-# ==========================================
-# 6. MAIN DASHBOARD UI
-# ==========================================
+
+# 6) MAIN DASHBOARD UI
+
 st.title("📊 Credit Risk Assessment")
 
 col1, col2 = st.columns([1, 1.5])
@@ -151,9 +145,8 @@ with col1:
     elif pred_int_rate < 15: st.caption("🔹 Standard Market Rate")
     else: st.caption("🔥 Subprime Rate Warning")
 
-# ==========================================
-# 7. EXPLAINABILITY & NARRATION (WITH AUDIO)
-# ==========================================
+# 7) EXPLAINABILITY & NARRATION (WITH AUDIO)
+
 with col2:
     st.subheader("🔍 Decision Intelligence")
     
@@ -189,9 +182,7 @@ with col2:
             ax.set_title("Risk Drivers (Red=Riskier)")
             st.pyplot(fig)
 
-# ==========================================
-# 8. AUTO-SOLVER
-# ==========================================
+
 st.markdown("---")
 if pred_default == 1:
     st.subheader("🔧 AI Optimizer")
@@ -210,9 +201,9 @@ if pred_default == 1:
     else:
         st.warning("Risk remains high even with lower amounts.")
 
-# ==========================================
-# 9. REAL AI CHATBOT (GEMINI)
-# ==========================================
+
+# 9) Ai ChatBot
+
 st.markdown("---")
 st.subheader("🤖 CreditIQ Assistant")
 
@@ -230,11 +221,10 @@ if prompt := st.chat_input("Ask about this loan..."):
 
     response_text = "Thinking..."
     
-    # REAL AI CONNECTION
+    # AI CONNECTION
     if gemini_key and gemini_key != "PASTE_YOUR_GEMINI_API_KEY_HERE":
         try:
             genai.configure(api_key=gemini_key)
-            # SWITCHED TO 'gemini-1.5-flash' TO FIX 404 ERRORS
             model = genai.GenerativeModel('gemini-2.5-flash')
             
             context = f"""
@@ -256,9 +246,9 @@ if prompt := st.chat_input("Ask about this loan..."):
         st.markdown(response_text)
     st.session_state.messages.append({"role": "assistant", "content": response_text})
 
-# ==========================================
-# 10. METRICS
-# ==========================================
+
+# 10) Key Metrices
+
 with st.expander("📉 Model Performance"):
     t1, t2 = st.tabs(["Classification", "Regression"])
     with t1:
@@ -266,4 +256,5 @@ with st.expander("📉 Model Performance"):
         st.metric("AUC", f"{c_metrics['auc']:.2f}")
     with t2:
         st.metric("MAE", f"{r_metrics['mae']:.4f}")
+
         st.metric("R2", f"{r_metrics['r2']:.4f}")
